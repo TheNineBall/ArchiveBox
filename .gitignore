@@ -5,6 +5,7 @@ __pycache__/
 .mypy_cache/
 .eggs/
 tests/out/
+.idea/*
 
 # Python and Node dependencies
 venv/

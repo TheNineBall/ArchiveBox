@@ -138,7 +138,7 @@ def snapshot_icons(snapshot) -> str:
             "screenshot": "💻",
             "media": "📼",
             "git": "🅶",
-            "archive_org": "🏛",
+#            "archive_org": "🏛",
             "readability": "🆁",
             "mercury": "🅼",
             "warc": "📦"

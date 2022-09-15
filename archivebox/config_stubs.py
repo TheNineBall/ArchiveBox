@@ -94,6 +94,7 @@ class ConfigDict(BaseConfig, total=False):
     YOUTUBEDL_BINARY: str
     CHROME_BINARY: Optional[str]
 
+    GALLERYDL_ARGS: List[str]
     YOUTUBEDL_ARGS: List[str]
     WGET_ARGS: List[str]
     CURL_ARGS: List[str]

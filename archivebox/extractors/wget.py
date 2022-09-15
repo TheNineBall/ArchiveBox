@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime, timezone
 
+from ..fake_useragent.fake import UserAgent
 from ..index.schema import Link, ArchiveResult, ArchiveOutput, ArchiveError
 from ..system import run, chmod_file
 from ..util import (
@@ -46,13 +47,12 @@ def should_save_wget(link: Link, out_dir: Optional[Path]=None, overwrite: Option
 @enforce_types
 def save_wget(link: Link, out_dir: Optional[Path]=None, timeout: int=TIMEOUT) -> ArchiveResult:
     """download full site using wget"""
-
+    WGET_USER_AGENT = UserAgent().Chrome
     out_dir = out_dir or link.link_dir
     if SAVE_WARC:
         warc_dir = out_dir / "warc"
         warc_dir.mkdir(exist_ok=True)
         warc_path = warc_dir / str(int(datetime.now(timezone.utc).timestamp()))
-
     # WGET CLI Docs: https://www.gnu.org/software/wget/manual/wget.html
     output: ArchiveOutput = None
     cmd = [

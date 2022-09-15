@@ -10,6 +10,8 @@ from ..util import (
     is_static_file,
 )
 from ..config import (
+    GALLERYDL_ARGS,
+    GALLERYDL_BINARY,
     MEDIA_TIMEOUT,
     SAVE_MEDIA,
     YOUTUBEDL_ARGS,
@@ -39,7 +41,7 @@ def save_media(link: Link, out_dir: Optional[Path]=None, timeout: int=MEDIA_TIME
     output: ArchiveOutput = 'media'
     output_path = out_dir / output
     output_path.mkdir(exist_ok=True)
-    cmd = [
+    cmd_yt = [
         YOUTUBEDL_BINARY,
         *YOUTUBEDL_ARGS,
         *([] if CHECK_SSL_VALIDITY else ['--no-check-certificate']),
@@ -49,27 +51,48 @@ def save_media(link: Link, out_dir: Optional[Path]=None, timeout: int=MEDIA_TIME
     status = 'succeeded'
     timer = TimedProgress(timeout, prefix='      ')
     try:
-        result = run(cmd, cwd=str(output_path), timeout=timeout + 1)
+        new_url = link.url
+        if 'archived.moe/' in link.url:
+            new_url.replace('archived.moe/', 'thebarchive.com/')
+        cmd = [
+            GALLERYDL_BINARY,
+            *GALLERYDL_ARGS,
+            f"--directory={output_path}",
+            link.url
+        ]
+        result = run(cmd, cwd=str(output_path), timeout=timeout + 3600)
+        if result.stderr and b'[error]' in result.stderr:
+            hints = ('Got gallery-dl response code: {}.'.format(result.returncode),
+                     *result.stderr.decode().split('\n'),)
+            raise ArchiveError('Failed to save media', hints)
         chmod_file(output, cwd=str(out_dir))
-        if result.returncode:
-            if (b'ERROR: Unsupported URL' in result.stderr
-                or b'HTTP Error 404' in result.stderr
-                or b'HTTP Error 403' in result.stderr
-                or b'URL could be a direct video link' in result.stderr
-                or b'Unable to extract container ID' in result.stderr):
-                # These happen too frequently on non-media pages to warrant printing to console
-                pass
-            else:
-                hints = (
-                    'Got youtube-dl response code: {}.'.format(result.returncode),
-                    *result.stderr.decode().split('\n'),
-                )
-                raise ArchiveError('Failed to save media', hints)
     except Exception as err:
         status = 'failed'
         output = err
     finally:
         timer.end()
+    # try:
+    #     result = run(cmd, cwd=str(output_path), timeout=timeout + 1)
+    #     chmod_file(output, cwd=str(out_dir))
+    #     if result.returncode:
+    #         if (b'ERROR: Unsupported URL' in result.stderr
+    #             or b'HTTP Error 404' in result.stderr
+    #             or b'HTTP Error 403' in result.stderr
+    #             or b'URL could be a direct video link' in result.stderr
+    #             or b'Unable to extract container ID' in result.stderr):
+    #             # These happen too frequently on non-media pages to warrant printing to console
+    #             pass
+    #         else:
+    #             hints = (
+    #                 'Got youtube-dl response code: {}.'.format(result.returncode),
+    #                 *result.stderr.decode().split('\n'),
+    #             )
+    #             raise ArchiveError('Failed to save media', hints)
+    # except Exception as err:
+    #     status = 'failed'
+    #     output += err
+    # finally:
+    #     timer.end()
 
     # add video description and subtitles to full-text index
     index_texts = [

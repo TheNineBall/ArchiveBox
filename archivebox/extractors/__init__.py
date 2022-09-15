@@ -54,7 +54,7 @@ def get_default_archive_methods():
         ('mercury', should_save_mercury, save_mercury),
         ('git', should_save_git, save_git),
         ('media', should_save_media, save_media),
-        ('archive_org', should_save_archive_dot_org, save_archive_dot_org),
+ #       ('archive_org', should_save_archive_dot_org, save_archive_dot_org),
     ]
 
 ARCHIVE_METHODS_INDEXING_PRECEDENCE = [('readability', 1), ('singlefile', 2), ('dom', 3), ('wget', 4)]

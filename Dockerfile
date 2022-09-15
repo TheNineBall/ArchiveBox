@@ -87,6 +87,7 @@ RUN apt-get update -qq \
     && python3 -c 'from distutils.core import run_setup; result = run_setup("./setup.py", stop_after="init"); print("\n".join(result.install_requires + result.extras_require["sonic"]))' > /tmp/requirements.txt \
     && pip install -r /tmp/requirements.txt \
     && pip install --upgrade youtube-dl yt-dlp \
+    && pip install -U gallery-dl \
     && apt-get purge -y build-essential python-dev python3-dev \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
@@ -104,9 +105,11 @@ RUN apt-get update -qq \
 WORKDIR "$CODE_DIR"
 ADD . "$CODE_DIR"
 RUN pip install -e .
+RUN chown -R 1000:1000 "$CODE_DIR"
 
 # Setup ArchiveBox runtime config
 WORKDIR "$DATA_DIR"
+RUN pip install --upgrade gallery-dl
 ENV IN_DOCKER=True \
     CHROME_SANDBOX=False \
     CHROME_BINARY="/usr/bin/chromium-browser" \
@@ -116,7 +119,8 @@ ENV IN_DOCKER=True \
     READABILITY_BINARY="$NODE_DIR/node_modules/.bin/readability-extractor" \
     USE_MERCURY=True \
     MERCURY_BINARY="$NODE_DIR/node_modules/.bin/mercury-parser" \
-    YOUTUBEDL_BINARY="yt-dlp"
+    YOUTUBEDL_BINARY="yt-dlp" \
+    GALLERYDL_BINARY="gallery-dl"
 
 # Print version for nice docker finish summary
 # RUN archivebox version

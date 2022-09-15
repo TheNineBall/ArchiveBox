@@ -118,7 +118,7 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
         'SAVE_WARC':                {'type': bool,  'default': True, 'aliases': ('FETCH_WARC',)},
         'SAVE_GIT':                 {'type': bool,  'default': True, 'aliases': ('FETCH_GIT',)},
         'SAVE_MEDIA':               {'type': bool,  'default': True, 'aliases': ('FETCH_MEDIA',)},
-        'SAVE_ARCHIVE_DOT_ORG':     {'type': bool,  'default': True, 'aliases': ('SUBMIT_ARCHIVE_DOT_ORG',)},
+        'SAVE_ARCHIVE_DOT_ORG':     {'type': bool,  'default': False, 'aliases': ('SUBMIT_ARCHIVE_DOT_ORG',)},
     },
 
     'ARCHIVE_METHOD_OPTIONS': {
@@ -136,6 +136,12 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
 
         'CHROME_HEADLESS':          {'type': bool,  'default': True},
         'CHROME_SANDBOX':           {'type': bool,  'default': lambda c: not c['IN_DOCKER']},
+        'GALLERYDL_ARGS':           {'type': list,  'default': lambda c: [
+                                                                # '--ugoira-conv-lossless',
+                                                                #'--directory=./',
+                                                                '--sleep=0.1-1.5',
+                                                                '--retries=15'
+                                                                ]},
         'YOUTUBEDL_ARGS':           {'type': list,  'default': lambda c: [
                                                                 '--write-description',
                                                                 '--write-info-json',
@@ -204,6 +210,7 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
         'READABILITY_BINARY':       {'type': str,   'default': lambda c: bin_path('readability-extractor')},
         'MERCURY_BINARY':           {'type': str,   'default': lambda c: bin_path('mercury-parser')},
         'YOUTUBEDL_BINARY':         {'type': str,   'default': 'youtube-dl'},
+        'GALLERYDL_BINARY':         {'type': str,   'default': 'gallery-dl'},
         'NODE_BINARY':              {'type': str,   'default': 'node'},
         'RIPGREP_BINARY':           {'type': str,   'default': 'rg'},
         'CHROME_BINARY':            {'type': str,   'default': None},
@@ -328,7 +335,11 @@ ALLOWED_IN_OUTPUT_DIR = {
 }
 
 def get_version(config):
-    return json.loads((Path(config['PACKAGE_DIR']) / 'package.json').read_text(encoding='utf-8').strip())['version']
+    try:
+        r = json.loads((Path(config['PACKAGE_DIR']) / 'package.json').read_text(encoding='utf-8').strip())['version']
+    except BaseException:
+        r = json.load(open('package.json'))['version']
+    return r
 
 def get_commit_hash(config):
     try:
@@ -959,7 +970,7 @@ def get_dependency_info(config: ConfigDict) -> ConfigValue:
         #     'is_valid': bool(config['SONIC_VERSION']),
         # },
     }
-
+from .fake_useragent.fake import UserAgent
 def get_chrome_info(config: ConfigDict) -> ConfigValue:
     return {
         'TIMEOUT': config['TIMEOUT'],
@@ -968,7 +979,7 @@ def get_chrome_info(config: ConfigDict) -> ConfigValue:
         'CHROME_BINARY': bin_path(config['CHROME_BINARY']),
         'CHROME_HEADLESS': config['CHROME_HEADLESS'],
         'CHROME_SANDBOX': config['CHROME_SANDBOX'],
-        'CHROME_USER_AGENT': config['CHROME_USER_AGENT'],
+        'CHROME_USER_AGENT': UserAgent().Chrome,
         'CHROME_USER_DATA_DIR': config['CHROME_USER_DATA_DIR'],
     }
 
