@@ -86,7 +86,8 @@ RUN apt-get update -qq \
     && echo 'empty placeholder for setup.py to use' > "$CODE_DIR/archivebox/README.md" \
     && python3 -c 'from distutils.core import run_setup; result = run_setup("./setup.py", stop_after="init"); print("\n".join(result.install_requires + result.extras_require["sonic"]))' > /tmp/requirements.txt \
     && pip install -r /tmp/requirements.txt \
-    && pip install --upgrade youtube-dl yt-dlp \
+#    && pip install --upgrade youtube-dl yt-dlp \
+    && pip install -U https://github.com/ytdl-patched/ytdl-patched/releases/latest/download/ytdl-patched.tar.gz \
     && pip install -U gallery-dl \
     && apt-get purge -y build-essential python-dev python3-dev \
     && apt-get autoremove -y \
@@ -119,7 +120,7 @@ ENV IN_DOCKER=True \
     READABILITY_BINARY="$NODE_DIR/node_modules/.bin/readability-extractor" \
     USE_MERCURY=True \
     MERCURY_BINARY="$NODE_DIR/node_modules/.bin/mercury-parser" \
-    YOUTUBEDL_BINARY="yt-dlp" \
+    YOUTUBEDL_BINARY="ytdl-patched" \
     GALLERYDL_BINARY="gallery-dl"
 
 # Print version for nice docker finish summary

@@ -35,7 +35,7 @@ from .pdf import should_save_pdf, save_pdf
 from .screenshot import should_save_screenshot, save_screenshot
 from .dom import should_save_dom, save_dom
 from .git import should_save_git, save_git
-from .media import should_save_media, save_media
+from .media import should_save_media, save_media, save_media_video
 from .archive_org import should_save_archive_dot_org, save_archive_dot_org
 from .headers import should_save_headers, save_headers
 
@@ -54,6 +54,7 @@ def get_default_archive_methods():
         ('mercury', should_save_mercury, save_mercury),
         ('git', should_save_git, save_git),
         ('media', should_save_media, save_media),
+        ('media_video', should_save_media, save_media_video),
  #       ('archive_org', should_save_archive_dot_org, save_archive_dot_org),
     ]
 

@@ -118,6 +118,7 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
         'SAVE_WARC':                {'type': bool,  'default': True, 'aliases': ('FETCH_WARC',)},
         'SAVE_GIT':                 {'type': bool,  'default': True, 'aliases': ('FETCH_GIT',)},
         'SAVE_MEDIA':               {'type': bool,  'default': True, 'aliases': ('FETCH_MEDIA',)},
+        'SAVE_MEDIA_VIDEO':         {'type': bool,  'default': True, 'aliases': ('FETCH_MEDIA_VIDEO',)},
         'SAVE_ARCHIVE_DOT_ORG':     {'type': bool,  'default': False, 'aliases': ('SUBMIT_ARCHIVE_DOT_ORG',)},
     },
 
